@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sophoun.ui.state.BaseViewModel
 import com.sophoun.ui.state.state.UiState
 
-abstract class BaseRecyclerViewHolder<T>
+abstract class GenericViewHolder<T>
     constructor(
         parent: ViewGroup,
         @LayoutRes layoutRes: Int

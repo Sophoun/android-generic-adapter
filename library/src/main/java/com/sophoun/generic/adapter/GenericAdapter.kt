@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import org.jetbrains.anko.childrenRecursiveSequence
 
-abstract class BaseRecyclerAdapter<T> : RecyclerView.Adapter<BaseRecyclerViewHolder<T>>() {
+abstract class GenericAdapter<T> : RecyclerView.Adapter<GenericViewHolder<T>>() {
 
     private val items = mutableListOf<T>()
     private lateinit var onBottomReachedListener: (position: Int) -> Unit
@@ -27,18 +27,26 @@ abstract class BaseRecyclerAdapter<T> : RecyclerView.Adapter<BaseRecyclerViewHol
         this.items.clear()
     }
 
+    fun getItems(): List<T> {
+        return this.items.toList()
+    }
+
+    fun getItem(position: Int): T {
+        return this.items[position]
+    }
+
     /**
      * Attach ViewHolder to adapter
      */
-    abstract fun attachViewHolder(parent: ViewGroup, viewType: Int) : BaseRecyclerViewHolder<T>
+    abstract fun attachViewHolder(parent: ViewGroup, viewType: Int) : GenericViewHolder<T>
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseRecyclerViewHolder<T> {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GenericViewHolder<T> {
         return attachViewHolder(parent, viewType)
     }
 
     override fun getItemCount(): Int = items.size
 
-    override fun onBindViewHolder(holder: BaseRecyclerViewHolder<T>, position: Int) {
+    override fun onBindViewHolder(holder: GenericViewHolder<T>, position: Int) {
         handleBottomReachedListener(position)
         // bind item to each view
         val item = items[position]
