@@ -1,41 +1,39 @@
 package com.sophoun.app.view.fragment
 
 import android.os.Bundle
-import android.view.LayoutInflater
+import android.util.Log
 import android.view.View
-import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.project.app.R
-import com.sophoun.app.view.activity.MainActivity
-import kotlinx.android.synthetic.main.fragment_first.*
-import kotlinx.android.synthetic.main.fragment_first.count
+import com.sophoun.app.view.adapter.SimpleAdapter
+import com.sophoun.ui.state.BaseFragment
+import com.sophoun.utils.DLog
 import kotlinx.android.synthetic.main.fragment_home.*
 
-class HomeFragment : AppBaseFragment() {
+class HomeFragment : BaseFragment() {
 
-    private val homeNav by lazy { (activity as MainActivity).homeNav }
+    private val simpleAdapter = SimpleAdapter()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_home, container, false)
-    }
+    override fun layout(): Int = R.layout.fragment_home
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        Thread {
-            var c = 0;
-            while (true) {
-                c = c+1
-                count?.text = c.toString()
-                Thread.sleep(1000)
-            }
-        }.start()
+        DLog.i("HomeFragment created.")
 
-        clickme.setOnClickListener {
-            homeNav.push(HomeFragment())
+        val list = mutableListOf<String>()
+        repeat(300) {
+            list.add("Hello World! $it")
         }
+
+        recycler_view.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        recycler_view.adapter = simpleAdapter
+
+        simpleAdapter.addOnItemClickListener { view, position, item ->
+            Log.i("Clicked:", "Item Clicked: ${view.id}")
+        }
+
+        simpleAdapter.setItems(list)
+        simpleAdapter.notifyDataSetChanged()
     }
 }

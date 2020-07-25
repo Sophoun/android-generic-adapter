@@ -3,29 +3,9 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <TextView
-            android:id="@+id/fragment_name"
-            android:text="@string/fragment"
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="35sp"
-            android:textAlignment="center"/>
+            android:layout_height="match_parent"/>
 
-    <TextView
-            android:id="@+id/count"
-            android:text="@string/fragment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="35sp"
-            android:layout_centerInParent="true"
-            android:textAlignment="center"/>
-
-    <Button
-            android:id="@+id/clickme"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/click_me"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="56dp"/>
 </RelativeLayout>

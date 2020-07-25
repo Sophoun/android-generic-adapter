@@ -1,5 +1,6 @@
 package com.sophoun.generic.adapter
 
+import android.annotation.SuppressLint
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ abstract class GenericAdapter<T> : RecyclerView.Adapter<GenericViewHolder<T>>() 
     private val items = mutableListOf<T>()
     private lateinit var onBottomReachedListener: (position: Int) -> Unit
     private lateinit var onItemClickListener: (view: View, position: Int, item: T) -> Unit
+    private lateinit var onChildItemClickListener: (view: View, position: Int, item: T) -> Unit
     private lateinit var onItemLongClickListener: (view: View, position: Int, item: T) -> Boolean
     private lateinit var onItemTouchListener: (event: MotionEvent, view: View, position: Int, item: T) -> Boolean
 
@@ -46,33 +48,34 @@ abstract class GenericAdapter<T> : RecyclerView.Adapter<GenericViewHolder<T>>() 
 
     override fun getItemCount(): Int = items.size
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: GenericViewHolder<T>, position: Int) {
         handleBottomReachedListener(position)
         // bind item to each view
         val item = items[position]
         holder.bind(item)
+        // set click listener to view from recycler adapter
+        if (::onItemClickListener.isInitialized) {
+            holder.itemView.setOnClickListener {
+                handleOnItemClickListener(it, position, item)
+            }
+        }
         // set click listener to child view from recycler adapter
-        holder.itemView.childrenRecursiveSequence().forEach { view ->
-            if (::onItemClickListener.isInitialized) {
-                view.setOnClickListener {
-                    handleOnItemClickListener(it, position, item)
-                }
+        if (::onItemClickListener.isInitialized) {
+            holder.itemView.childrenRecursiveSequence().forEach { view ->
+                view.setOnClickListener { handleOnChildItemClickListener(view, position, item) }
             }
         }
         // set long click listener to child view from recycler adapter
-        holder.itemView.childrenRecursiveSequence().forEach { view ->
-            if (::onItemLongClickListener.isInitialized) {
-                view.setOnLongClickListener {
-                    handleOnItemLongClickListener(it, position, item)
-                }
+        if (::onItemLongClickListener.isInitialized) {
+            holder.itemView.setOnLongClickListener {
+                handleOnItemLongClickListener(it, position, item)
             }
         }
         // set touch listener to child view from recycler adapter
-        holder.itemView.childrenRecursiveSequence().forEach { view ->
-            if (::onItemTouchListener.isInitialized) {
-                view.setOnTouchListener { _, event ->
-                    return@setOnTouchListener handleOnItemTouchListener(event, view, position, item)
-                }
+        if (::onItemTouchListener.isInitialized) {
+            holder.itemView.setOnTouchListener { view, event ->
+                return@setOnTouchListener handleOnItemTouchListener(event, view, position, item)
             }
         }
     }
@@ -106,6 +109,17 @@ abstract class GenericAdapter<T> : RecyclerView.Adapter<GenericViewHolder<T>>() 
 
     private fun handleOnItemClickListener(view: View, position: Int, item: T) {
         onItemClickListener(view, position, item)
+    }
+
+    /**
+     * Add callback for child item click
+     */
+    fun addOnChildItemClickListener(onChildItemClickListener: (view: View, position: Int, item: T) -> Unit) {
+        this.onChildItemClickListener = onChildItemClickListener
+    }
+
+    private fun handleOnChildItemClickListener(view: View, position: Int, item: T) {
+        onChildItemClickListener(view, position, item)
     }
 
     /**
