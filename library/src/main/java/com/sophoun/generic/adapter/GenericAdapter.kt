@@ -61,7 +61,7 @@ abstract class GenericAdapter<T> : RecyclerView.Adapter<GenericViewHolder<T>>() 
             }
         }
         // set click listener to child view from recycler adapter
-        if (::onItemClickListener.isInitialized) {
+        if (::onChildItemClickListener.isInitialized) {
             holder.itemView.childrenRecursiveSequence().forEach { view ->
                 view.setOnClickListener { handleOnChildItemClickListener(view, position, item) }
             }
