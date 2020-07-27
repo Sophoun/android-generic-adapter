@@ -13,6 +13,7 @@ abstract class GenericAdapter<T> : RecyclerView.Adapter<GenericViewHolder<T>>() 
     private lateinit var onBottomReachedListener: (position: Int) -> Unit
     private lateinit var onItemClickListener: (view: View, position: Int, item: T) -> Unit
     private lateinit var onChildItemClickListener: (view: View, position: Int, item: T) -> Unit
+    private val childItemIdClickedListener: HashMap<Int, (view: View, position: Int, item: T) -> Unit> = hashMapOf()
     private lateinit var onItemLongClickListener: (view: View, position: Int, item: T) -> Boolean
     private lateinit var onItemTouchListener: (event: MotionEvent, view: View, position: Int, item: T) -> Boolean
 
@@ -64,6 +65,15 @@ abstract class GenericAdapter<T> : RecyclerView.Adapter<GenericViewHolder<T>>() 
         if (::onChildItemClickListener.isInitialized) {
             holder.itemView.childrenRecursiveSequence().forEach { view ->
                 view.setOnClickListener { handleOnChildItemClickListener(view, position, item) }
+            }
+        }
+        // set click listener to child view from recycler adapter
+        if (childItemIdClickedListener.isNotEmpty()) {
+            childItemIdClickedListener.entries.forEach { map ->
+                holder.itemView.childrenRecursiveSequence().find { it.id == map.key }
+                    ?.setOnClickListener {
+                        handleOnChildItemIdClickListener(it, position, item)
+                }
             }
         }
         // set long click listener to child view from recycler adapter
@@ -120,6 +130,17 @@ abstract class GenericAdapter<T> : RecyclerView.Adapter<GenericViewHolder<T>>() 
 
     private fun handleOnChildItemClickListener(view: View, position: Int, item: T) {
         onChildItemClickListener(view, position, item)
+    }
+
+    /**
+     * Add callback for child item id click
+     */
+    fun addOnChildItemIdClickListener(childId: Int, onChildItemIdClickListener: (view: View, position: Int, item: T) -> Unit) {
+        this.childItemIdClickedListener[childId] = onChildItemIdClickListener
+    }
+
+    private fun handleOnChildItemIdClickListener(view: View, position: Int, item: T) {
+        childItemIdClickedListener[view.id]?.invoke(view, position, item)
     }
 
     /**
